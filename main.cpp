@@ -1,23 +1,29 @@
 #include "MainWindow.h"
 #include "GestureClassifier.h"
 #include "TobiiListener.h"
+#include "AppManager.h"
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlEngine>
 #include <QQmlComponent>
+#include <QMetaObject>
+#include <QQmlContext>
+#include <QObject>
+#include <QMetaType>
+#include <QDebug>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    qmlRegisterType<TobiiListener>("io.qt.tobiiListener", 1, 0, "TobiiListener");
-    TobiiListener listener(0, true);
-    int id = qRegisterMetaType<SamplePoint>();
+    QQmlApplicationEngine engine;
+    QQmlContext *context = engine.rootContext();
+    engine.load("../SelectionWithNodAndSelection/Target.qml");
+    QObject *root = engine.rootObjects()[0];
+    QObject *rect = root->findChild<QObject*>("rect");
 
-    GestureClassifier classifier;
-    //bool nodConnected = QObject::connect(&classifier, SIGNAL(nodSignal()), &listener, SLOT(onGaze(SamplePoint(0,0))));
-    bool nodConnected = QObject::connect(&classifier, SIGNAL(nodSignal()), &classifier, SLOT(printNod()));
-    bool shakeConnected = QObject::connect(&classifier, SIGNAL(shakeSignal()), &classifier, SLOT(printShake()));
-    classifier.Start();
+    qRegisterMetaType<SamplePoint>("SamplePoint");
+    qRegisterMetaType<FixationPoint>("FixationPoint");
 
+    AppManager appManager(root);
     return a.exec();
 }

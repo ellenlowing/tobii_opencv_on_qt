@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <QCloseEvent>
-#include <QQmlEngine>
-#include <QQmlComponent>
+//#include <QQmlEngine>
+//#include <QQmlComponent>
 #include <QMetaObject>
 #include <QDebug>
 #include <opencv2/core/core.hpp>
@@ -15,12 +15,13 @@
 #include <vector>
 #include <iostream>
 #include <time.h>
+#include "SamplePoint.h"
 
 class GestureClassifier : public QObject
 {
     Q_OBJECT
 public:
-    explicit GestureClassifier(QObject *parent = 0);
+    explicit GestureClassifier(QObject *parent);
     const int WIDTH = 640;
     const int HEIGHT = 480;
     const std::string imageWindow;
@@ -34,6 +35,9 @@ public:
     clock_t now;
     clock_t nodTime0;
     clock_t shakeTime0;
+    clock_t fixationTime0;
+    clock_t fixationTime;
+    double fixationTicks;
     double nodTicks;
     double shakeTicks;
     cv::VideoCapture capture;
@@ -44,9 +48,11 @@ public:
     bool initialized = false;
     bool nodInitialized = false;
     bool shakeInitialized = false;
+    bool fixationInitialized = false;
     std::vector<double> Ypts;
     std::vector<double> Xpts;
-    void Start();
+    void StartTracking();
+    void StartDetectingNodAndShake();
     void detectAndDisplay(cv::Mat &frame, cv::CascadeClassifier face_cascade, cv::CascadeClassifier nose_cascade, cv::Point &searchCenter, cv::Size &searchSize);
     bool detectNod(std::vector<double> pts);
     bool detectShake(std::vector<double> pts);
@@ -68,13 +74,14 @@ signals:
     void shakeSignal();
 
 public slots:
-    void printNod();
-    void printShake();
+    void onNod();
+    void onShake();
+    void onNewFixation(QPointF point);
 
 private:
-    QQmlEngine engine;
-    QQmlComponent *component;
-    QObject *object;
+//    QQmlEngine engine;
+//    QQmlComponent *component;
+//    QObject *object;
 };
 
 #endif // GESTURECLASSIFIER_H

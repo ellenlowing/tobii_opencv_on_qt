@@ -3,9 +3,9 @@
 
 #include <QObject>
 #include <QList>
-#include <QQmlEngine>
-#include <QQmlComponent>
-#include <QMetaObject>
+//#include <QQmlEngine>
+//#include <QQmlComponent>
+//#include <QMetaObject>
 
 #include "SamplePoint.h"
 
@@ -37,14 +37,11 @@ public slots:
     void controlToggled(bool notControlling);
     void onGaze(SamplePoint gaze);
 
-//private slots:
-//    void onGaze(SamplePoint gaze);
-
 private:
     bool controlling;
-    QQmlEngine engine;
-    QQmlComponent *component;
-    QObject *object;
+//    QQmlEngine engine;
+//    QQmlComponent *component;
+//    QObject *object;
 };
 
 #endif // TOBIILISTENER_H

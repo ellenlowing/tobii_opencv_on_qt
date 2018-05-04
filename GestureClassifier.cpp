@@ -21,12 +21,9 @@ GestureClassifier::GestureClassifier(QObject *parent) : QObject(parent)
 
     namedWindow(imageWindow);
 
-    component = new QQmlComponent(&engine, "../TobiiTrial2/Target.qml");
-    object = component->create();
-//    QObject *rect = object->findChild<QObject*>("rect");
-//    if(rect){
-//        QObject::connect(this, SIGNAL(nodSignal()), rect, SIGNAL(destroyok()));
-//    }
+//    component = new QQmlComponent(&engine, "../SelectionWithNodAndSelection/Target.qml");
+//    object = component->create();
+
 }
 
 GestureClassifier::~GestureClassifier()
@@ -44,14 +41,12 @@ void GestureClassifier::closeEvent(QCloseEvent *event)
 }
 
 
-void GestureClassifier::Start(){
-    //cout << "Started" << endl;
+void GestureClassifier::StartTracking(){
     while (true){
 
         if(breakLoop==true){
             return;
         }
-        Mat frameDest = Mat::zeros(frame.rows, frame.cols, CV_8UC1);
         capture.read(frame);
         //mySkinDetect(frame, frameDest);
         if(initialized) {
@@ -62,44 +57,21 @@ void GestureClassifier::Start(){
             detectAndDisplay(frame, face_cascade, nose_cascade, searchCenter, searchSize);
             initialized = setTrackPoint(frame, searchCenter, prevLoc, tmpl, fullTmpl);
         }
-        Ypts.erase(Ypts.begin());
-        Ypts.push_back(prevLoc.y);
-        Xpts.erase(Xpts.begin());
-        Xpts.push_back(prevLoc.x);
 
-
-
-        bool shakeDetected = detectShake(Xpts);
-        bool nodDetected = detectNod(Ypts);
-        if(shakeDetected && !nodDetected){
-            if(!shakeInitialized){
-                emit shakeSignal();
-                shakeInitialized = true;
-                shakeTime0 = clock();
-            }
+        if(fixationInitialized){
+            StartDetectingNodAndShake();
         }
-        if(nodDetected && !shakeDetected){
-            if(!nodInitialized){
-                emit nodSignal();
-                nodInitialized = true;
-                nodTime0 = clock();
-            }
+        fixationTime = clock();
+        fixationTicks = (double)(fixationTime - fixationTime0);
+        if(fixationTicks > 4*CLOCKS_PER_SEC){
+            fixationInitialized = false;
         }
 
-        now = clock();
-        shakeTicks = (double)(now-shakeTime0);
-        nodTicks = (double)(now-nodTime0);
-
-        if(nodTicks >2*CLOCKS_PER_SEC && nodInitialized){
-            nodInitialized = false;
+        if(fixationInitialized) {
+            circle(frame, prevLoc, 10, Scalar(255, 0, 0), 4, 8, 0);
+        }else{
+            circle(frame, prevLoc, 10, Scalar(255, 255, 255), 4, 8, 0);
         }
-
-        if(shakeTicks > 2*CLOCKS_PER_SEC && shakeInitialized){
-            shakeInitialized = false;
-        }
-
-
-        circle(frame, prevLoc, 10, Scalar(255, 255, 255), 4, 8, 0);
         imshow(imageWindow, frame);
 
         if(waitKey(1) == 27){
@@ -109,8 +81,42 @@ void GestureClassifier::Start(){
             return;
         }
     }
+}
 
+void GestureClassifier::StartDetectingNodAndShake(){
+    Ypts.erase(Ypts.begin());
+    Ypts.push_back(prevLoc.y);
+    Xpts.erase(Xpts.begin());
+    Xpts.push_back(prevLoc.x);
 
+    bool shakeDetected = detectShake(Xpts);
+    bool nodDetected = detectNod(Ypts);
+    if(shakeDetected && !nodDetected){
+        if(!shakeInitialized){
+            emit shakeSignal();
+            shakeInitialized = true;
+            shakeTime0 = clock();
+        }
+    }
+    if(nodDetected && !shakeDetected){
+        if(!nodInitialized){
+            emit nodSignal();
+            nodInitialized = true;
+            nodTime0 = clock();
+        }
+    }
+
+    now = clock();
+    shakeTicks = (double)(now-shakeTime0);
+    nodTicks = (double)(now-nodTime0);
+
+    if(nodTicks >2*CLOCKS_PER_SEC && nodInitialized){
+        nodInitialized = false;
+    }
+
+    if(shakeTicks > 2*CLOCKS_PER_SEC && shakeInitialized){
+        shakeInitialized = false;
+    }
 }
 
 void GestureClassifier::detectAndDisplay(cv::Mat &frame, cv::CascadeClassifier face_cascade, cv::CascadeClassifier nose_cascade, Point &searchCenter, Size &searchSize)
@@ -318,21 +324,33 @@ bool GestureClassifier::detectShake(vector<double> pts){
     }
 }
 
-void GestureClassifier::printNod(){
+void GestureClassifier::onNod(){
     cout << "SLOT: nod detected!" << endl;
-    //emit signal
-    QObject *rect = object->findChild<QObject*>("rect");
-    if(rect){
-        QMetaObject::invokeMethod(rect, "destroyTarget");
-        qDebug() << "Rectangle found!";
-    }else{
-        qDebug() << "No rectangle!";
-    }
+
+
+//    QObject *rect = object->findChild<QObject*>("rect");
+//    if(rect){
+//        QMetaObject::invokeMethod(rect, "destroyTarget");
+//        qDebug() << "Rectangle found!";
+//    }else{
+//        qDebug() << "No rectangle!";
+//    }
 }
 
-void GestureClassifier::printShake(){
+void GestureClassifier::onShake(){
     cout << "SLOT: shake detected!" << endl;
-    //emit signal
+
+}
+
+void GestureClassifier::onNewFixation(QPointF point){
+    float x = point.x();
+    float y = point.y();
+    if(!fixationInitialized && x >= 800 && x <= 900 && y >= 450 && y <= 550){
+        cout << "onNewFixation: " << x << ", " << y << endl;
+        fixationTime0 = clock();
+        fixationInitialized = true;
+        //StartDetectingNodAndShake();
+    }
 }
 
 cv::Mat GestureClassifier::workingFrame(cv::Mat &frame)

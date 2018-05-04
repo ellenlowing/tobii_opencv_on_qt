@@ -45,13 +45,19 @@ SOURCES += main.cpp\
     QPointFUtil.cpp \
     SamplePoint.cpp \
     Timer.cpp \
-    TobiiListener.cpp
+    TobiiListener.cpp \
+    PointerManager.cpp \
+    GazeRecalibration.cpp \
+    AppManager.cpp
 HEADERS  += MainWindow.h \
     GestureClassifier.h \
     QPointFUtil.h \
     SamplePoint.h \
     Timer.h \
-    TobiiListener.h
+    TobiiListener.h \
+    PointerManager.h \
+    GazeRecalibration.h \
+    AppManager.h
 win32 {
     # Copy DLLs
     DEST = $${OUT_PWD}

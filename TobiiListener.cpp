@@ -37,6 +37,7 @@ static TX_CONTEXTHANDLE hContext = TX_EMPTY_HANDLE;
 static QList<TobiiListener *> instances;
 static QList<QPointF> fixationData;
 
+
 // We need this because OnGazeDataEvent occurs in a different thread and onGaze has to be run on the main thread
 GazeEmitter *emitter;
 
@@ -45,14 +46,14 @@ TobiiListener::TobiiListener(){}
 TobiiListener::TobiiListener(QObject *root, bool controlling) :
     QObject(root), controlling(controlling)
 {
-    component = new QQmlComponent(&engine, "../TobiiTrial2/Target.qml");
-    object = component->create();
+//    component = new QQmlComponent(&engine, "../SelectionWithNodAndSelection/Target.qml");
+//    object = component->create();
     if (instances.size() == 0)
     {
         emitter = new GazeEmitter(root);
         if (controlling) initialize();
     }
-    //connect(emitter, SIGNAL(newGaze(SamplePoint)), this, SLOT(onGaze(SamplePoint)));
+    connect(emitter, SIGNAL(newGaze(SamplePoint)), this, SLOT(onGaze(SamplePoint)));
     instances.append(this);
 }
 
@@ -83,15 +84,19 @@ void TobiiListener::controlToggled(bool notControlling)
 
 void TobiiListener::onGaze(SamplePoint gaze)
 {
-    if (controlling && !gazed)
+
+    if (controlling)
     {
         emit newGaze(gaze);
-        QObject *rect = object->findChild<QObject*>("rect");
-        if(rect){
-            QMetaObject::invokeMethod(rect, "destroyTarget");
-            qDebug() << "Rectangle found!";
-            gazed = true;
-        }
+//        QObject *rect = object->findChild<QObject*>("rect");
+//        if(rect){
+//            gazePointX = gazePointX/4.0;
+//            gazePointY = gazePointY/3.5;
+//            QMetaObject::invokeMethod(rect, "moveWithGaze", Q_ARG(QVariant, gazePointX), Q_ARG(QVariant, gazePointY));
+//            //qDebug() << "Set rectangle's x to 100";
+//            //QMetaObject::invokeMethod(rect, "destroyTarget");
+//            //qDebug() << "Rectangle found!";
+//        }
     }
 }
 
@@ -220,6 +225,7 @@ void OnGazeDataEvent(TX_HANDLE hGazeDataBehavior)
         // We will use the current timestamp instead of eventParams.Timestamp
         // With a single reference for all the timestamps it is easier to work with the events
         emit emitter->newGaze(SamplePoint(Timer::timestamp(), QPointF(eventParams.X, eventParams.Y)));
+        //qDebug() << "Gaze: " << eventParams.X << ", " << eventParams.Y;
     } else {
         qDebug() << "(EyeX) Failed to interpret gaze data event packet.";
     }

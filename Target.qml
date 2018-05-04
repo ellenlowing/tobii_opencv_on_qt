@@ -1,30 +1,35 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
-import io.qt.tobiiListener 1.0
+//import io.qt.tobiiListener 1.0
 
 ApplicationWindow {
     id: win
     visible: true
-    width: 640
-    height: 480
+    width: 1600
+    height: 900
     title: qsTr("Gaze target!")
 
     Rectangle {
         id: rect
         objectName: "rect"
         color: "#FF0000"
-        x: 320
-        y: 240
-        width: 20
-        height: 20
+        x: 800
+        y: 450
+        width: 100
+        height: 100
         visible: true
-        signal destroyok(var a)
-        onDestroyok: destroyTarget()
-        function destroyTarget(){
-            console.log("detected");
-            rect.destroy();
+
+        function moveWithGaze(gazePointX, gazePointY){
+            rect.x = gazePointX;
+            rect.y = gazePointY;
+
         }
+    }
+
+    function destroyTarget(){
+        console.log("destroyTarget is called");
+        rect.color= "#00FF00";
     }
 
 }
