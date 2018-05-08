@@ -1,9 +1,8 @@
 #include "GestureClassifier.h"
-
+#include <QMetaObject>
 using namespace cv;
 using namespace std;
-
-GestureClassifier::GestureClassifier(QObject *parent) : QObject(parent)
+GestureClassifier::GestureClassifier(QObject *parent) : QObject(parent), rect(parent->findChild<QObject*>("rect"))
 {
     capture.open(0);
     //set height and width of capture frame
@@ -20,10 +19,6 @@ GestureClassifier::GestureClassifier(QObject *parent) : QObject(parent)
     }
 
     namedWindow(imageWindow);
-
-//    component = new QQmlComponent(&engine, "../SelectionWithNodAndSelection/Target.qml");
-//    object = component->create();
-
 }
 
 GestureClassifier::~GestureClassifier()
@@ -326,20 +321,12 @@ bool GestureClassifier::detectShake(vector<double> pts){
 
 void GestureClassifier::onNod(){
     cout << "SLOT: nod detected!" << endl;
-
-
-//    QObject *rect = object->findChild<QObject*>("rect");
-//    if(rect){
-//        QMetaObject::invokeMethod(rect, "destroyTarget");
-//        qDebug() << "Rectangle found!";
-//    }else{
-//        qDebug() << "No rectangle!";
-//    }
+    QMetaObject::invokeMethod(rect, "turnGreen");
 }
 
 void GestureClassifier::onShake(){
     cout << "SLOT: shake detected!" << endl;
-
+    QMetaObject::invokeMethod(rect, "turnRed");
 }
 
 void GestureClassifier::onNewFixation(QPointF point){

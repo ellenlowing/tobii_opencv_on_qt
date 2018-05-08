@@ -82,6 +82,7 @@ private:
 //    QQmlEngine engine;
 //    QQmlComponent *component;
 //    QObject *object;
+    QObject *rect;
 };
 
 #endif // GESTURECLASSIFIER_H

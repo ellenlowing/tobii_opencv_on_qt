@@ -13,7 +13,7 @@ ApplicationWindow {
     Rectangle {
         id: rect
         objectName: "rect"
-        color: "#FF0000"
+        color: "#0000FF"
         x: 800
         y: 450
         width: 100
@@ -25,12 +25,17 @@ ApplicationWindow {
             rect.y = gazePointY;
 
         }
+
+        function turnGreen(){
+            rect.color= "#00FF00";
+        }
+
+        function turnRed(){
+            rect.color = "#FF0000";
+        }
     }
 
-    function destroyTarget(){
-        console.log("destroyTarget is called");
-        rect.color= "#00FF00";
-    }
+
 
 }
 

@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     engine.load("../SelectionWithNodAndSelection/Target.qml");
     QObject *root = engine.rootObjects()[0];
     QObject *rect = root->findChild<QObject*>("rect");
-
+    //QMetaObject::invokeMethod(rect, "destroyTarget");
     qRegisterMetaType<SamplePoint>("SamplePoint");
     qRegisterMetaType<FixationPoint>("FixationPoint");
 
