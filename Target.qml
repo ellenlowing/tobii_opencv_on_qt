@@ -10,9 +10,21 @@ ApplicationWindow {
     height: 900
     title: qsTr("Gaze target!")
 
+    Text {
+        text: "Gaze matches!"
+        objectName: "textObject"
+        font.family: "Helvetica"
+        font.pointSize: 16
+        color: "#000000"
+        visible: false
+        x: 800
+        y: 400
+
+    }
+
     Rectangle {
         id: rect
-        objectName: "rect"
+        objectName: "rectObject"
         color: "#0000FF"
         x: 800
         y: 450

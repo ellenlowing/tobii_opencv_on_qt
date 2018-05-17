@@ -2,7 +2,7 @@
 #include <QMetaObject>
 using namespace cv;
 using namespace std;
-GestureClassifier::GestureClassifier(QObject *parent) : QObject(parent), rect(parent->findChild<QObject*>("rect"))
+GestureClassifier::GestureClassifier(QObject *parent) : QObject(parent), rect(parent->findChild<QObject*>("rectObject")), text(parent->findChild<QObject*>("textObject"))
 {
     capture.open(0);
     //set height and width of capture frame
@@ -58,12 +58,13 @@ void GestureClassifier::StartTracking(){
         }
         fixationTime = clock();
         fixationTicks = (double)(fixationTime - fixationTime0);
-        if(fixationTicks > 4*CLOCKS_PER_SEC){
+        if(fixationTicks > 1*CLOCKS_PER_SEC){
             fixationInitialized = false;
+            text->setProperty("visible", "false");
         }
 
         if(fixationInitialized) {
-            circle(frame, prevLoc, 10, Scalar(255, 0, 0), 4, 8, 0);
+            circle(frame, prevLoc, 10, Scalar(255, 255, 255), 4, 8, 0);
         }else{
             circle(frame, prevLoc, 10, Scalar(255, 255, 255), 4, 8, 0);
         }
@@ -336,7 +337,7 @@ void GestureClassifier::onNewFixation(QPointF point){
         cout << "onNewFixation: " << x << ", " << y << endl;
         fixationTime0 = clock();
         fixationInitialized = true;
-        //StartDetectingNodAndShake();
+        text->setProperty("visible", "true");
     }
 }
 
