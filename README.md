@@ -1,11 +1,10 @@
 # tobii_opencv_on_qt
-Integration of Tobii eye tracking and OpenCV head gesture recognition implemented on QT platform
+Integration of Tobii eye tracking and OpenCV head gesture recognition implemented on Qt platform
 
 # Setup guide
-[Set up QT creator that is compatible with OpenCV](https://www.youtube.com/watch?v=ox6NFWE8xg4&lc=Ughv6GFWxv8XR3gCoAEC)
+1. [Set up QT creator that is compatible with OpenCV](https://www.youtube.com/watch?v=ox6NFWE8xg4&lc=Ughv6GFWxv8XR3gCoAEC)
+2. Clone this repository.
+3. Open project file (.pro) in Qt Creator.
+4. Update include path for OpenCV to corresponding absolute paths.
 
-(Note that this build is based on QT 5.4.1, so some QT newer functions cannot be used.)
-
-Copy and paste everything to QT project file (.pro). Make sure include path for OpenCV is updated.
-
-(If running the project results in a large number of errors, it's likely that 'CONFIG += c++11' is not included in the project file.)
+Note that this build is based on Qt 5.4.1, so some Qt newer functions cannot be used. If running the project results in a large number of errors, it's likely that 'CONFIG += c++11' is not included in the project file.
